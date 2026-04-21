@@ -562,9 +562,9 @@
           <div class="f-date-wrap">
             <span class="cal-icon">📅</span>
             <div class="f-date-range">
-              <input type="month" id="f-start" value="2026-03">
+              <input type="month" id="f-start" value="2026-03" style="width:114px;">
               <span class="f-date-sep">-</span>
-              <input type="month" id="f-end" value="2026-04">
+              <input type="month" id="f-end" value="2026-04" style="width:114px;">
             </div>
           </div>
         </div>
@@ -601,14 +601,12 @@
         <thead>
           <tr>
             <th style="width:56px;">序号</th>
-            <th style="width:90px;">领域</th>
-            <th style="width:90px;">反馈人</th>
-            <th style="width:130px;">手机号码</th>
+            <th style="width:160px;">体检医院</th>
+            <th style="width:120px;">体检区域</th>
+            <th style="width:100px;">类型（领域）</th>
             <th style="width:160px;">反馈时间</th>
-            <th style="width:90px;">用户状态</th>
-            <th style="width:160px;">反馈单位</th>
-            <th style="width:90px;">处理状态</th>
-            <th>操作</th>
+            <th>反馈内容</th>
+            <th style="width:72px;">操作</th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -634,18 +632,18 @@ const DOMAIN_CLASS = {
 const STATUS_CLASS = { '待审核':'status-pending','已结案':'status-done','已处理':'status-review' };
 
 const ALL_DATA = [
-  { name:'莫芸芸', phone:'15250826698', time:'2026-04-21 09:54:09', hospital:'宜兴市中医院',      domain:'服务态度',   status:'待审核', content:'体检当天排队等候时间较长，窗口工作人员态度较冷漠。' },
-  { name:'秦杰',   phone:'18036898887', time:'2026-04-21 08:25:45', hospital:'宜兴市中医院',      domain:'办事流程',   status:'已结案', content:'体检报告领取流程不清晰，到处询问才找到取报告的地方。' },
-  { name:'任玥',   phone:'15739350599', time:'2026-04-21 08:17:37', hospital:'宜兴市人民医院',    domain:'制度机制',   status:'待审核', content:'体检套餐价格与官网介绍不符，现场补缴了差价。' },
-  { name:'张燕',   phone:'15961572205', time:'2026-04-21 07:56:53', hospital:'宜兴市中医院',      domain:'信息公开',   status:'待审核', content:'体检项目说明不够详细，不清楚各项检查的目的和注意事项。' },
-  { name:'张忙',   phone:'17712465830', time:'2026-04-20 22:51:35', hospital:'宜兴市第二人民医院',domain:'制度机制',   status:'待审核', content:'老年人免费体检项目宣传不到位，很多老人不知道可以免费体检。' },
-  { name:'周海英', phone:'13961591383', time:'2026-04-20 17:42:11', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'B超室工作人员非常耐心，解释清晰，整体体验很好，给予表扬。' },
-  { name:'李梅仙', phone:'13912465562', time:'2026-04-20 15:31:22', hospital:'宜兴市人民医院',    domain:'设施布局',   status:'已结案', content:'体检中心卫生间数量不足，高峰期等候时间长。' },
-  { name:'程康利', phone:'13639639871', time:'2026-04-20 09:35:40', hospital:'宜兴市人民医院',    domain:'办事流程',   status:'待审核', content:'抽血后需要自己去多个窗口领结果，建议统一汇总后通知领取。' },
-  { name:'李彩英', phone:'18888034364', time:'2026-04-20 09:30:30', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'体检报告出来的时间比承诺的晚了两天，影响了工作安排。' },
-  { name:'李彩英', phone:'18888034364', time:'2026-04-20 09:27:28', hospital:'宜兴市中医院',      domain:'数字化服务', status:'已结案', content:'希望能在网上直接查看体检报告，现在只能去医院现场领取。' },
-  { name:'王大明', phone:'13800138000', time:'2026-04-19 16:08:52', hospital:'宜兴市第二人民医院',domain:'数字化服务', status:'待审核', content:'手机预约体检时APP经常闪退，操作不流畅，建议优化小程序性能。' },
-  { name:'陈小红', phone:'13912340099', time:'2026-04-18 11:20:44', hospital:'宜兴市人民医院',    domain:'其他',       status:'已结案', content:'体检1楼候诊区座位不够，很多人站着等候，希望增加座位。' },
+  { area:'体检1楼',   time:'2026-04-21 09:54:09', hospital:'宜兴市中医院',      domain:'服务态度',   status:'待审核', content:'体检当天排队等候时间较长，窗口工作人员态度较冷漠。' },
+  { area:'取药窗口', time:'2026-04-21 08:25:45', hospital:'宜兴市中医院',      domain:'办事流程',   status:'已结案', content:'体检报告领取流程不清晰，到处询问才找到取报告的地方。' },
+  { area:'门诊2楼',  time:'2026-04-21 08:17:37', hospital:'宜兴市人民医院',    domain:'制度机制',   status:'待审核', content:'体检套餐价格与官网介绍不符，现场补缴了差价。' },
+  { area:'体检1楼',   time:'2026-04-21 07:56:53', hospital:'宜兴市中医院',      domain:'信息公开',   status:'待审核', content:'体检项目说明不够详细，不清楚各项检查的目的和注意事项。' },
+  { area:'门诊2楼',  time:'2026-04-20 22:51:35', hospital:'宜兴市第二人民医院',domain:'制度机制',   status:'待审核', content:'老年人免费体检项目宣传不到位，很多老人不知道可以免费体检。' },
+  { area:'体检1楼',   time:'2026-04-20 17:42:11', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'B超室工作人员非常耐心，解释清晰，整体体验很好，给予表扬。' },
+  { area:'卫生间区域',time:'2026-04-20 15:31:22', hospital:'宜兴市人民医院',    domain:'设施布局',   status:'已结案', content:'体检中心卫生间数量不足，高峰期等候时间长。' },
+  { area:'抽血室',   time:'2026-04-20 09:35:40', hospital:'宜兴市人民医院',    domain:'办事流程',   status:'待审核', content:'抽血后需要自己去多个窗口领结果，建议统一汇总后通知领取。' },
+  { area:'取报告处', time:'2026-04-20 09:30:30', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'体检报告出来的时间比承诺的晚了两天，影响了工作安排。' },
+  { area:'网上服务', time:'2026-04-20 09:27:28', hospital:'宜兴市中医院',      domain:'数字化服务', status:'已结案', content:'希望能在网上直接查看体检报告，现在只能去医院现场领取。' },
+  { area:'小程序',   time:'2026-04-19 16:08:52', hospital:'宜兴市第二人民医院',domain:'数字化服务', status:'待审核', content:'手机预约体检时APP经常闪退，操作不流畅，建议优化小程序性能。' },
+  { area:'候诊区',   time:'2026-04-18 11:20:44', hospital:'宜兴市人民医院',    domain:'其他',       status:'已结案', content:'体检1楼候诊区座位不够，很多人站着等候，希望增加座位。' },
 ];
 
 let filtered = [...ALL_DATA];
@@ -655,13 +653,11 @@ function renderTable(data) {
   document.getElementById('table-body').innerHTML = data.map((row, i) => `
     <tr>
       <td class="idx">${i + 1}</td>
-      <td><span class="type-tag ${DOMAIN_CLASS[row.domain] || ''}">${row.domain}</span></td>
-      <td>${row.name}</td>
-      <td>${row.phone}</td>
-      <td>${row.time}</td>
-      <td>未删除</td>
       <td>${row.hospital}</td>
-      <td><span class="status-tag ${STATUS_CLASS[row.status] || ''}">${row.status}</span></td>
+      <td>${row.area}</td>
+      <td><span class="type-tag ${DOMAIN_CLASS[row.domain] || ''}">${row.domain}</span></td>
+      <td>${row.time}</td>
+      <td class="content-col"><div class="content-abbr">${row.content}</div></td>
       <td><span class="action-link" onclick="alert('${row.content}')">查看</span></td>
     </tr>
   `).join('');
