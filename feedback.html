@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>体检反馈</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+      background: #ffffff;
+      min-height: 100vh;
+      max-width: 390px;
+      margin: 0 auto;
+      padding-bottom: 64px;
+    }
+
+    /* 蓝色内容区域 */
+    .content-bg {
+      background: linear-gradient(180deg, #6B9FDA 0%, #9DC2ED 30%, #BDD5F5 60%, #D8E9FC 85%, #EBF2FD 100%);
+      min-height: calc(100vh - 52px);
+      padding-bottom: 80px;
+    }
+
+    /* Header */
+    .header {
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e5e5;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-btn { width: 32px; font-size: 18px; color: #555; cursor: pointer; user-select: none; }
+    .header-more { text-align: right; letter-spacing: 1px; }
+    .header-center { flex: 1; text-align: center; }
+    .header-title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+    .header-url { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+    /* Description */
+    .desc {
+      padding: 16px 20px 20px;
+      text-align: center;
+      color: rgba(255,255,255,0.95);
+      font-size: 13.5px;
+      line-height: 2;
+    }
+
+    /* Card section */
+    .section {
+      position: relative;
+      margin: 6px 12px 18px;
+    }
+    .section-label {
+      position: absolute;
+      top: -13px;
+      left: 0;
+      background: linear-gradient(135deg, #3EC8A4, #52D4B8);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 8px 8px 8px 0;
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Field rows */
+    .row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      min-height: 52px;
+      border-bottom: 1px solid #f3f3f3;
+    }
+    .row:last-child { border-bottom: none; }
+    .star { color: #E53935; margin-right: 4px; font-size: 14px; flex-shrink: 0; }
+    .no-star { margin-left: 12px; }
+    .row-label { font-size: 15px; color: #1a1a1a; flex-shrink: 0; }
+    .row-value { flex: 1; text-align: right; font-size: 14px; color: #333; }
+    .placeholder { color: #ccc; }
+    .phone-red { color: #E53935; font-size: 15px; font-weight: 500; }
+    .arrow { color: #ccc; font-size: 11px; margin-left: 4px; }
+    .check { font-size: 16px; color: #bbb; margin-left: 8px; }
+    .check-red { font-size: 16px; color: #bbb; margin-left: 8px; }
+
+    /* Toggle */
+    .toggle {
+      margin-left: auto;
+      display: flex;
+      border: 1.5px solid #4361EE;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .t-btn {
+      padding: 5px 18px;
+      font-size: 14px;
+      border: none;
+      background: white;
+      color: #4361EE;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .t-btn:first-child { border-right: 1.5px solid #4361EE; }
+    .t-btn.on { background: #4361EE; color: white; }
+
+    /* 反映内容 section */
+    .reflect-label-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px 8px;
+      border-bottom: none;
+    }
+    .textarea-wrap { padding: 0 16px 14px; }
+    .f-textarea {
+      width: 100%;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #333;
+      font-family: inherit;
+      resize: none;
+      height: 80px;
+    }
+    .f-textarea::placeholder { color: #ccc; }
+    .f-textarea:focus { outline: none; border-color: #4361EE; }
+    .inline-input::placeholder { color: #ccc; }
+
+    /* Attachment */
+    .attach-wrap { padding: 0 16px 18px; border-top: 1px solid #f3f3f3; padding-top: 14px; }
+    .attach-title { font-size: 14px; color: #333; margin-bottom: 10px; }
+    .attach-box {
+      width: 72px; height: 72px;
+      border: 1.5px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+      font-size: 30px;
+      font-weight: 300;
+    }
+
+    /* Submit */
+    .submit-fixed {
+      position: fixed;
+      bottom: 0;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 390px;
+      padding: 0 16px 16px;
+      background: transparent;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #4A6CF7;
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 2px;
+      border-radius: 10px;
+    }
+
+    /* 底部弹窗 */
+    .sheet-mask {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+    }
+    .sheet-mask.show { display: block; }
+    .sheet {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      border-radius: 16px 16px 0 0;
+      overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.28s ease;
+    }
+    .sheet-mask.show .sheet { transform: translateY(0); }
+    .sheet-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid #f2f2f2;
+    }
+    .sheet-cancel { font-size: 15px; color: #999; cursor: pointer; }
+    .sheet-title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+    .sheet-confirm { font-size: 15px; color: #4A6CF7; font-weight: 600; cursor: pointer; }
+    .sheet-option {
+      padding: 16px 20px;
+      font-size: 16px; color: #1a1a1a;
+      border-bottom: 1px solid #f8f8f8;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sheet-option:active { background: #f5f5f5; }
+    .sheet-option.selected { color: #4A6CF7; }
+    .sheet-option .check-icon { color: #4A6CF7; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <span class="header-btn" onclick="history.back()">✕</span>
+  <div class="header-center">
+    <div class="header-title">体检反馈</div>
+    <div class="header-url">yx-area-ddjy.juyizhilian.com</div>
+  </div>
+  <span class="header-btn header-more">···</span>
+</div>
+
+<!-- Description -->
+<div class="content-bg">
+<div class="desc">
+  为了医院更好地了解您体检过程中的问题<br>
+  请您详细填写以下信息，以便医院进行跟进处理
+</div>
+
+<!-- 人员信息 -->
+<div class="section">
+  <div class="section-label">人员信息</div>
+  <div class="card">
+
+    <div class="row">
+      <span class="star">*</span>
+      <span class="row-label">匿名反馈</span>
+      <div class="toggle">
+        <button class="t-btn" id="btn-yes" onclick="setAnon(true)">是</button>
+        <button class="t-btn on" id="btn-no" onclick="setAnon(false)">否</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="star">*</span>
+      <span class="row-label">姓名</span>
+      <span class="row-value" id="name-val">王*贵</span>
+      <span class="check">›</span>
+    </div>
+
+    <div class="row">
+      <span class="star">*</span>
+      <span class="row-label">手机号</span>
+      <span class="row-value phone-red">13477778888</span>
+      <span class="check-red">›</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- 事项信息 -->
+<div class="section">
+  <div class="section-label">事项信息</div>
+  <div class="card">
+
+    <div class="row" onclick="openSheet()" style="cursor:pointer;">
+      <span class="star">*</span>
+      <span class="row-label">体检医院</span>
+      <span class="row-value placeholder" id="hospital-val">请选择</span>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div class="reflect-label-row">
+      <span class="star">*</span>
+      <span class="row-label">体检区域</span>
+    </div>
+    <div class="textarea-wrap">
+      <input type="text" class="f-textarea inline-input"
+        placeholder="门诊2楼、体检1楼、取药、住院等"
+        style="height:42px;resize:none;display:block;width:100%;" />
+    </div>
+
+    <div class="row" onclick="openSheet2()" style="cursor:pointer;">
+      <span class="star">*</span>
+      <span class="row-label">体检领域</span>
+      <span class="row-value placeholder" id="domain-val">请选择</span>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div class="reflect-label-row">
+      <span class="star">*</span>
+      <span class="row-label">反馈内容</span>
+    </div>
+    <div class="textarea-wrap">
+      <textarea class="f-textarea" placeholder="请输入" maxlength="300" id="feedback-text" oninput="countChars()"></textarea>
+      <div style="text-align:right;font-size:12px;color:#bbb;margin-top:4px;"><span id="char-count">0</span>/300</div>
+    </div>
+
+    <div class="attach-wrap">
+      <div class="attach-title">附件(最多9张)</div>
+      <div class="attach-box">+</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Submit -->
+<div class="submit-fixed">
+  <button class="submit-btn">立即提交</button>
+</div>
+</div><!-- /content-bg -->
+
+<!-- 体检医院弹窗 -->
+<div class="sheet-mask" id="sheet-mask" onclick="onMaskClick(event)">
+  <div class="sheet">
+    <div class="sheet-header">
+      <span class="sheet-cancel" onclick="closeSheet()">取消</span>
+      <span class="sheet-title">选择体检医院</span>
+      <span class="sheet-confirm" onclick="closeSheet()">确定</span>
+    </div>
+    <div class="sheet-option" onclick="selectHospital(this,'宜兴市人民医院')">宜兴市人民医院<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectHospital(this,'宜兴市中医院')">宜兴市中医院<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectHospital(this,'宜兴市第二人民医院')">宜兴市第二人民医院<span class="check-icon" style="display:none;">✓</span></div>
+  </div>
+</div>
+
+<!-- 体检领域弹窗 -->
+<div class="sheet-mask" id="sheet-mask2" onclick="onMaskClick2(event)">
+  <div class="sheet">
+    <div class="sheet-header">
+      <span class="sheet-cancel" onclick="closeSheet2()">取消</span>
+      <span class="sheet-title">选择体检领域</span>
+      <span class="sheet-confirm" onclick="closeSheet2()">确定</span>
+    </div>
+    <div class="sheet-option" onclick="selectDomain(this,'制度机制')">制度机制<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectDomain(this,'设施布局')">设施布局<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectDomain(this,'办事流程')">办事流程<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectDomain(this,'服务态度')">服务态度<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectDomain(this,'信息公开')">信息公开<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectDomain(this,'数字化服务')">数字化服务<span class="check-icon" style="display:none;">✓</span></div>
+    <div class="sheet-option" onclick="selectDomain(this,'其他')">其他<span class="check-icon" style="display:none;">✓</span></div>
+  </div>
+</div>
+
+<script>
+function openSheet() { document.getElementById('sheet-mask').classList.add('show'); }
+function closeSheet() { document.getElementById('sheet-mask').classList.remove('show'); }
+function onMaskClick(e) { if (e.target === e.currentTarget) closeSheet(); }
+function selectHospital(el, name) {
+  document.querySelectorAll('#sheet-mask .sheet-option').forEach(o => {
+    o.classList.remove('selected');
+    o.querySelector('.check-icon').style.display = 'none';
+  });
+  el.classList.add('selected');
+  el.querySelector('.check-icon').style.display = 'inline';
+  const val = document.getElementById('hospital-val');
+  val.textContent = name; val.style.color = '#333';
+}
+
+function openSheet2() { document.getElementById('sheet-mask2').classList.add('show'); }
+function closeSheet2() { document.getElementById('sheet-mask2').classList.remove('show'); }
+function onMaskClick2(e) { if (e.target === e.currentTarget) closeSheet2(); }
+function selectDomain(el, name) {
+  document.querySelectorAll('#sheet-mask2 .sheet-option').forEach(o => {
+    o.classList.remove('selected');
+    o.querySelector('.check-icon').style.display = 'none';
+  });
+  el.classList.add('selected');
+  el.querySelector('.check-icon').style.display = 'inline';
+  const val = document.getElementById('domain-val');
+  val.textContent = name; val.style.color = '#333';
+  closeSheet2();
+}
+
+function countChars() {
+  document.getElementById('char-count').textContent = document.getElementById('feedback-text').value.length;
+}
+
+function setAnon(isAnon) {
+  document.getElementById('btn-yes').classList.toggle('on', isAnon);
+  document.getElementById('btn-no').classList.toggle('on', !isAnon);
+  document.getElementById('name-val').textContent = isAnon ? '王*贵'.split('').map(() => '*').join('') : '王*贵';
+}
+</script>
+
+</body>
+</html>
