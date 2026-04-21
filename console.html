@@ -558,15 +558,7 @@
     <div class="filter-card">
       <div class="filter-row">
         <div class="f-group">
-          <span class="f-label">时间周期</span>
-          <select class="f-select" id="f-period">
-            <option>月</option>
-            <option>周</option>
-            <option>日</option>
-          </select>
-        </div>
-        <div class="f-group">
-          <span class="f-label">操作日期</span>
+          <span class="f-label">反馈日期</span>
           <div class="f-date-wrap">
             <span class="cal-icon">📅</span>
             <div class="f-date-range">
@@ -598,26 +590,6 @@
             <option>其他</option>
           </select>
         </div>
-        <div class="f-group">
-          <span class="f-label">内容搜索</span>
-          <div class="f-input-wrap">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="f-keyword" placeholder="输入姓名或手机号">
-          </div>
-        </div>
-      </div>
-      <div class="filter-row">
-        <div class="f-group">
-          <span class="f-label">状态</span>
-          <select class="f-select" id="f-status" style="min-width:120px;">
-            <option value="">请选择</option>
-            <option>待审核</option>
-            <option>已结案</option>
-          </select>
-        </div>
-        <label class="f-checkbox-group">
-          <input type="checkbox" id="f-timeout"> 是否超时
-        </label>
         <button class="btn-query" onclick="applyFilter()">查询</button>
         <button class="btn-reset" onclick="resetFilter()">重置</button>
       </div>
@@ -698,22 +670,16 @@ function renderTable(data) {
 function applyFilter() {
   const hospital = document.getElementById('f-hospital').value;
   const domain   = document.getElementById('f-domain').value;
-  const status   = document.getElementById('f-status').value;
-  const keyword  = document.getElementById('f-keyword').value.trim();
   filtered = ALL_DATA.filter(row => {
     if (hospital && row.hospital !== hospital) return false;
     if (domain   && row.domain   !== domain)   return false;
-    if (status   && row.status   !== status)   return false;
-    if (keyword  && !row.name.includes(keyword) && !row.phone.includes(keyword)) return false;
     return true;
   });
   renderTable(filtered);
 }
 
 function resetFilter() {
-  ['f-hospital','f-domain','f-status'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-keyword').value = '';
-  document.getElementById('f-timeout').checked = false;
+  ['f-hospital','f-domain'].forEach(id => document.getElementById(id).value = '');
   filtered = [...ALL_DATA];
   renderTable(filtered);
 }
