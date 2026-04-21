@@ -429,6 +429,96 @@
       text-align: center; font-size: 13px; outline: none;
     }
     .pg-goto input:focus { border-color: #4361EE; }
+
+    /* ===== DRAWER ===== */
+    .drawer-mask {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 500;
+    }
+    .drawer-mask.open { display: block; }
+    .drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 420px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      display: flex;
+      flex-direction: column;
+      z-index: 501;
+    }
+    .drawer-mask.open .drawer { transform: translateX(0); }
+    .drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .drawer-title { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .drawer-close {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .drawer-close:hover { background: #eee; }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .drawer-section {
+      margin-bottom: 20px;
+    }
+    .drawer-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #aaa;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .drawer-field {
+      display: flex;
+      align-items: flex-start;
+      padding: 9px 0;
+      border-bottom: 1px solid #fafafa;
+      gap: 12px;
+    }
+    .drawer-field:last-child { border-bottom: none; }
+    .df-label {
+      width: 80px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: #888;
+      padding-top: 1px;
+    }
+    .df-value {
+      flex: 1;
+      font-size: 13px;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+    .df-value.content { color: #333; }
+    .anon-tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: #f0f0f0;
+      color: #666;
+    }
+    .anon-tag.yes { background: #fff3e0; color: #bf6000; }
   </style>
 </head>
 <body>
@@ -632,18 +722,18 @@ const DOMAIN_CLASS = {
 const STATUS_CLASS = { '待审核':'status-pending','已结案':'status-done','已处理':'status-review' };
 
 const ALL_DATA = [
-  { area:'体检1楼',   time:'2026-04-21 09:54:09', hospital:'宜兴市中医院',      domain:'服务态度',   status:'待审核', content:'体检当天排队等候时间较长，窗口工作人员态度较冷漠。' },
-  { area:'取药窗口', time:'2026-04-21 08:25:45', hospital:'宜兴市中医院',      domain:'办事流程',   status:'已结案', content:'体检报告领取流程不清晰，到处询问才找到取报告的地方。' },
-  { area:'门诊2楼',  time:'2026-04-21 08:17:37', hospital:'宜兴市人民医院',    domain:'制度机制',   status:'待审核', content:'体检套餐价格与官网介绍不符，现场补缴了差价。' },
-  { area:'体检1楼',   time:'2026-04-21 07:56:53', hospital:'宜兴市中医院',      domain:'信息公开',   status:'待审核', content:'体检项目说明不够详细，不清楚各项检查的目的和注意事项。' },
-  { area:'门诊2楼',  time:'2026-04-20 22:51:35', hospital:'宜兴市第二人民医院',domain:'制度机制',   status:'待审核', content:'老年人免费体检项目宣传不到位，很多老人不知道可以免费体检。' },
-  { area:'体检1楼',   time:'2026-04-20 17:42:11', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'B超室工作人员非常耐心，解释清晰，整体体验很好，给予表扬。' },
-  { area:'卫生间区域',time:'2026-04-20 15:31:22', hospital:'宜兴市人民医院',    domain:'设施布局',   status:'已结案', content:'体检中心卫生间数量不足，高峰期等候时间长。' },
-  { area:'抽血室',   time:'2026-04-20 09:35:40', hospital:'宜兴市人民医院',    domain:'办事流程',   status:'待审核', content:'抽血后需要自己去多个窗口领结果，建议统一汇总后通知领取。' },
-  { area:'取报告处', time:'2026-04-20 09:30:30', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'体检报告出来的时间比承诺的晚了两天，影响了工作安排。' },
-  { area:'网上服务', time:'2026-04-20 09:27:28', hospital:'宜兴市中医院',      domain:'数字化服务', status:'已结案', content:'希望能在网上直接查看体检报告，现在只能去医院现场领取。' },
-  { area:'小程序',   time:'2026-04-19 16:08:52', hospital:'宜兴市第二人民医院',domain:'数字化服务', status:'待审核', content:'手机预约体检时APP经常闪退，操作不流畅，建议优化小程序性能。' },
-  { area:'候诊区',   time:'2026-04-18 11:20:44', hospital:'宜兴市人民医院',    domain:'其他',       status:'已结案', content:'体检1楼候诊区座位不够，很多人站着等候，希望增加座位。' },
+  { anon:false, name:'莫芸芸', phone:'15250826698', area:'体检1楼',    time:'2026-04-21 09:54:09', hospital:'宜兴市中医院',       domain:'服务态度',   content:'体检当天排队等候时间较长，窗口工作人员态度较冷漠。' },
+  { anon:false, name:'秦杰',   phone:'18036898887', area:'取药窗口',  time:'2026-04-21 08:25:45', hospital:'宜兴市中医院',       domain:'办事流程',   content:'体检报告领取流程不清晰，到处询问才找到取报告的地方。' },
+  { anon:true,  name:'***',    phone:'153****0599',  area:'门诊2楼',  time:'2026-04-21 08:17:37', hospital:'宜兴市人民医院',     domain:'制度机制',   content:'体检套餐价格与官网介绍不符，现场补缴了差价。' },
+  { anon:false, name:'张燕',   phone:'15961572205', area:'体检1楼',    time:'2026-04-21 07:56:53', hospital:'宜兴市中医院',       domain:'信息公开',   content:'体检项目说明不够详细，不清楚各项检查的目的和注意事项。' },
+  { anon:false, name:'张忙',   phone:'17712465830', area:'门诊2楼',  time:'2026-04-20 22:51:35', hospital:'宜兴市第二人民医院', domain:'制度机制',   content:'老年人免费体检项目宣传不到位，很多老人不知道可以免费体检。' },
+  { anon:false, name:'周海英', phone:'13961591383', area:'体检1楼',    time:'2026-04-20 17:42:11', hospital:'宜兴市中医院',       domain:'服务态度',   content:'B超室工作人员非常耐心，解释清晰，整体体验很好，给予表扬。' },
+  { anon:true,  name:'***',    phone:'139****5562',  area:'卫生间区域',time:'2026-04-20 15:31:22', hospital:'宜兴市人民医院',     domain:'设施布局',   content:'体检中心卫生间数量不足，高峰期等候时间长。' },
+  { anon:false, name:'程康利', phone:'13639639871', area:'抽血室',    time:'2026-04-20 09:35:40', hospital:'宜兴市人民医院',     domain:'办事流程',   content:'抽血后需要自己去多个窗口领结果，建议统一汇总后通知领取。' },
+  { anon:false, name:'李彩英', phone:'18888034364', area:'取报告处',  time:'2026-04-20 09:30:30', hospital:'宜兴市中医院',       domain:'服务态度',   content:'体检报告出来的时间比承诺的晚了两天，影响了工作安排。' },
+  { anon:false, name:'李彩英', phone:'18888034364', area:'网上服务',  time:'2026-04-20 09:27:28', hospital:'宜兴市中医院',       domain:'数字化服务', content:'希望能在网上直接查看体检报告，现在只能去医院现场领取。' },
+  { anon:true,  name:'***',    phone:'138****8000',  area:'小程序',   time:'2026-04-19 16:08:52', hospital:'宜兴市第二人民医院', domain:'数字化服务', content:'手机预约体检时APP经常闪退，操作不流畅，建议优化小程序性能。' },
+  { anon:false, name:'陈小红', phone:'13912340099', area:'候诊区',    time:'2026-04-18 11:20:44', hospital:'宜兴市人民医院',     domain:'其他',       content:'体检1楼候诊区座位不够，很多人站着等候，希望增加座位。' },
 ];
 
 let filtered = [...ALL_DATA];
@@ -658,9 +748,30 @@ function renderTable(data) {
       <td><span class="type-tag ${DOMAIN_CLASS[row.domain] || ''}">${row.domain}</span></td>
       <td>${row.time}</td>
       <td class="content-col"><div class="content-abbr">${row.content}</div></td>
-      <td><span class="action-link" onclick="alert('${row.content}')">查看</span></td>
+      <td><span class="action-link" onclick="openDrawer(${i})">查看</span></td>
     </tr>
   `).join('');
+}
+
+function openDrawer(idx) {
+  const row = filtered[idx];
+  document.getElementById('d-anon').innerHTML     = row.anon ? '<span class="anon-tag yes">是</span>' : '<span class="anon-tag">否</span>';
+  document.getElementById('d-name').textContent    = row.name;
+  document.getElementById('d-phone').textContent   = row.phone;
+  document.getElementById('d-hospital').textContent = row.hospital;
+  document.getElementById('d-area').textContent    = row.area;
+  document.getElementById('d-domain').textContent  = row.domain;
+  document.getElementById('d-time').textContent    = row.time;
+  document.getElementById('d-content').textContent = row.content;
+  document.getElementById('drawer-mask').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-mask').classList.remove('open');
+}
+
+function onMaskClick(e) {
+  if (e.target === e.currentTarget) closeDrawer();
 }
 
 function applyFilter() {
@@ -683,5 +794,60 @@ function resetFilter() {
 renderTable(ALL_DATA);
 </script>
 
+<!-- Detail Drawer -->
+<div class="drawer-mask" id="drawer-mask" onclick="onMaskClick(event)">
+  <div class="drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">反馈详情</span>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-section">
+        <div class="drawer-section-title">人员信息</div>
+        <div class="drawer-field">
+          <span class="df-label">匿名反馈</span>
+          <span class="df-value" id="d-anon"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">姓名</span>
+          <span class="df-value" id="d-name"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">手机号</span>
+          <span class="df-value" id="d-phone"></span>
+        </div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-title">事项信息</div>
+        <div class="drawer-field">
+          <span class="df-label">体检医院</span>
+          <span class="df-value" id="d-hospital"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">体检区域</span>
+          <span class="df-value" id="d-area"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">体检领域</span>
+          <span class="df-value" id="d-domain"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">反馈时间</span>
+          <span class="df-value" id="d-time"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">反馈内容</span>
+          <span class="df-value content" id="d-content"></span>
+        </div>
+        <div class="drawer-field">
+          <span class="df-label">附件</span>
+          <span class="df-value" style="color:#ccc;">暂无附件</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
 </body>
 </html>
