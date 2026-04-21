@@ -430,6 +430,62 @@
     }
     .pg-goto input:focus { border-color: #4361EE; }
 
+    /* ===== CHART ===== */
+    .chart-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+    }
+    .chart-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 150px;
+      padding-bottom: 0;
+    }
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+    }
+    .bar-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      height: 18px;
+      line-height: 18px;
+    }
+    .bar-track {
+      flex: 1;
+      width: 60%;
+      display: flex;
+      align-items: flex-end;
+      margin: 4px 0;
+    }
+    .bar-fill {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      min-height: 3px;
+      transition: height 0.35s ease;
+    }
+    .bar-label {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
     /* ===== DRAWER ===== */
     .drawer-mask {
       display: none;
@@ -685,6 +741,12 @@
       </div>
     </div>
 
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-title">各领域反馈数量</div>
+      <div class="chart-wrap" id="chart-bars"></div>
+    </div>
+
     <!-- Table -->
     <div class="table-card">
       <table id="feedback-table">
@@ -738,6 +800,27 @@ const ALL_DATA = [
 
 let filtered = [...ALL_DATA];
 
+const DOMAINS = ['制度机制','设施布局','办事流程','服务态度','信息公开','数字化服务','其他'];
+const BAR_COLORS = {
+  '制度机制':'#E57373','设施布局':'#4DB6AC','办事流程':'#FFB74D',
+  '服务态度':'#66BB6A','信息公开':'#7986CB','数字化服务':'#4361EE','其他':'#90A4AE'
+};
+
+function renderChart(data) {
+  const counts = {};
+  DOMAINS.forEach(d => counts[d] = 0);
+  data.forEach(row => { if (counts[row.domain] !== undefined) counts[row.domain]++; });
+  const max = Math.max(...Object.values(counts), 1);
+  document.getElementById('chart-bars').innerHTML = DOMAINS.map(d => {
+    const pct = Math.round((counts[d] / max) * 100);
+    return `<div class="chart-col">
+      <div class="bar-count">${counts[d]}</div>
+      <div class="bar-track"><div class="bar-fill" style="height:${pct}%;background:${BAR_COLORS[d]};"></div></div>
+      <div class="bar-label">${d}</div>
+    </div>`;
+  }).join('');
+}
+
 function renderTable(data) {
   document.getElementById('total-count').textContent = data.length;
   document.getElementById('table-body').innerHTML = data.map((row, i) => `
@@ -751,6 +834,7 @@ function renderTable(data) {
       <td><span class="action-link" onclick="openDrawer(${i})">查看</span></td>
     </tr>
   `).join('');
+  renderChart(data);
 }
 
 function openDrawer(idx) {
@@ -802,8 +886,6 @@ renderTable(ALL_DATA);
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
     <div class="drawer-body">
-      <div class="drawer-section">
-        <div class="drawer-section-title">人员信息</div>
         <div class="drawer-field">
           <span class="df-label">匿名反馈</span>
           <span class="df-value" id="d-anon"></span>
@@ -816,9 +898,6 @@ renderTable(ALL_DATA);
           <span class="df-label">手机号</span>
           <span class="df-value" id="d-phone"></span>
         </div>
-      </div>
-      <div class="drawer-section">
-        <div class="drawer-section-title">事项信息</div>
         <div class="drawer-field">
           <span class="df-label">体检医院</span>
           <span class="df-value" id="d-hospital"></span>
@@ -843,7 +922,6 @@ renderTable(ALL_DATA);
           <span class="df-label">附件</span>
           <span class="df-value" style="color:#ccc;">暂无附件</span>
         </div>
-      </div>
     </div>
   </div>
 </div>
