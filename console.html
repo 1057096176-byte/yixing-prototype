@@ -803,7 +803,7 @@ function renderChart(data) {
   });
 
   document.getElementById('chart-bars').innerHTML = `
-    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="height:${H}px;">
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${H}">
       <text x="${mL}" y="11" font-size="10" fill="#bbb">（数量）</text>
       ${gridLines}
       <line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT + cH}" stroke="#e8e8e8" stroke-width="1"/>
