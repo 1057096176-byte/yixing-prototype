@@ -3,486 +3,755 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>体检反馈管理控制台</title>
+  <title>体检反馈 — 管理后台</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: #f0f2f5;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Top Nav */
-    .topnav {
-      background: #1b3a6e;
-      height: 52px;
+    /* ===== TOP NAV ===== */
+    .topbar {
+      height: 46px;
+      background: linear-gradient(90deg, #4361EE 0%, #5b7af5 60%, #6a8af8 100%);
       display: flex;
       align-items: center;
-      padding: 0 20px;
-      gap: 16px;
+      padding: 0 0 0 0;
+      flex-shrink: 0;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
     }
-    .nav-logo {
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .nav-spacer { flex: 1; }
-    .nav-user {
-      color: rgba(255,255,255,0.8);
-      font-size: 13px;
+    .topbar-logo {
+      width: 160px;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+      height: 100%;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
     }
-    .nav-avatar {
+    .topbar-logo .logo-dot { color: rgba(255,255,255,0.7); font-size: 11px; }
+    .topbar-tabs {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding-left: 6px;
+      gap: 2px;
+      flex: 1;
+    }
+    .topbar-tab {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      gap: 6px;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+    .topbar-tab.active {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border-bottom-color: white;
+      font-weight: 600;
+    }
+    .topbar-tab .tab-close {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: white;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-right: 18px;
+      color: rgba(255,255,255,0.85);
+    }
+    .topbar-right .icon { font-size: 16px; cursor: pointer; }
+    .notif-wrap { position: relative; }
+    .notif-badge {
+      position: absolute;
+      top: -4px; right: -6px;
+      background: #ff4d4f;
+      border-radius: 8px;
+      min-width: 16px; height: 16px;
+      font-size: 10px;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 3px;
+    }
+    .user-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 20px;
+      padding: 3px 10px 3px 3px;
+      cursor: pointer;
+    }
+    .user-avatar {
       width: 28px; height: 28px;
       border-radius: 50%;
-      background: #4a7fcf;
+      background: rgba(255,255,255,0.3);
       display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 12px;
     }
+    .user-avatar svg { opacity: 0.9; }
+    .user-name { font-size: 13px; color: white; }
 
-    /* Toggle pill top-left */
+    /* Mobile/Console toggle in topbar */
     .view-toggle {
-      display: inline-flex;
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 6px;
+      display: flex;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 5px;
       overflow: hidden;
+      margin-right: 6px;
     }
     .vt-btn {
-      padding: 5px 12px;
+      padding: 4px 10px;
       font-size: 12px;
-      color: rgba(255,255,255,0.65);
+      color: rgba(255,255,255,0.7);
       background: transparent;
       border: none;
       cursor: pointer;
       text-decoration: none;
+      display: flex; align-items: center;
+    }
+    .vt-btn + .vt-btn { border-left: 1px solid rgba(255,255,255,0.3); }
+    .vt-btn.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
+
+    /* ===== LAYOUT ===== */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 160px;
+      flex-shrink: 0;
+      background: #1e2a45;
+      min-height: calc(100vh - 46px);
+      overflow-y: auto;
+      position: sticky;
+      top: 46px;
+      height: calc(100vh - 46px);
+    }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .menu-group { }
+    .menu-item {
       display: flex;
       align-items: center;
-    }
-    .vt-btn + .vt-btn { border-left: 1px solid rgba(255,255,255,0.35); }
-    .vt-btn.active { background: rgba(255,255,255,0.18); color: white; font-weight: 600; }
-
-    /* Page container */
-    .page {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px 16px;
-    }
-
-    /* Page header */
-    .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-    .page-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1a1a2e;
-    }
-    .page-subtitle {
+      padding: 11px 16px;
       font-size: 13px;
-      color: #888;
-      margin-top: 2px;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      gap: 8px;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.07); }
+    .menu-item.active {
+      background: #4361EE;
+      color: white;
+      font-weight: 600;
+    }
+    .menu-item .m-icon { width: 16px; flex-shrink: 0; opacity: 0.7; font-size: 14px; text-align: center; }
+    .menu-item.active .m-icon { opacity: 1; }
+    .menu-item .m-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,0.35); }
+    .menu-sub { }
+    .menu-sub .menu-item {
+      padding-left: 32px;
+      font-size: 12.5px;
+    }
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 8px;
+    }
+    .sidebar-footer .menu-item { padding: 9px 0; }
+
+    /* ===== MAIN ===== */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
+      min-width: 0;
     }
 
-    /* Stats cards */
+    /* ===== STAT CARDS ===== */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+      gap: 0;
       margin-bottom: 18px;
-    }
-    @media (max-width: 700px) {
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
     }
     .stat-card {
-      background: white;
-      border-radius: 10px;
-      padding: 16px 18px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      padding: 18px 20px 16px;
+      position: relative;
     }
-    .stat-label {
+    .stat-card:not(:last-child) {
+      border-right: 1px solid rgba(0,0,0,0.06);
+    }
+    .stat-card-1 { background: #eef2ff; }
+    .stat-card-2 { background: #edfaf4; }
+    .stat-card-3 { background: #fffbe6; }
+    .stat-card-4 { background: #f3eeff; }
+    .stat-title {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .stat-num {
+      font-size: 30px;
+      font-weight: 700;
+      color: #1a1a2e;
+      line-height: 1;
+    }
+    .stat-sub {
+      position: absolute;
+      right: 18px;
+      top: 20px;
       font-size: 12px;
       color: #888;
-      margin-bottom: 6px;
     }
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1b3a6e;
-    }
-    .stat-value span {
-      font-size: 14px;
-      font-weight: 400;
-      color: #aaa;
-      margin-left: 2px;
-    }
-    .stat-trend {
+    .stat-sub em { color: #4361EE; font-style: normal; }
+    .stat-extra {
       font-size: 12px;
+      color: #888;
       margin-top: 4px;
-      color: #52c41a;
     }
-    .stat-trend.down { color: #E53935; }
+    .stat-extra em { color: #E53935; font-style: normal; }
 
-    /* Filter bar */
-    .filter-bar {
+    /* ===== FILTER BAR ===== */
+    .filter-card {
       background: white;
-      border-radius: 10px;
-      padding: 14px 16px;
+      border-radius: 8px;
+      padding: 14px 16px 10px;
       margin-bottom: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .filter-row {
       display: flex;
-      align-items: flex-end;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
       flex-wrap: wrap;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: 10px;
     }
-    .filter-item {
+    .filter-row:last-child { margin-bottom: 0; }
+    .f-group {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
-      min-width: 160px;
+      align-items: center;
+      gap: 6px;
     }
-    .filter-label {
-      font-size: 12px;
-      color: #666;
+    .f-label {
+      font-size: 13px;
+      color: #555;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .filter-select, .filter-input {
-      height: 34px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
+    .f-select, .f-input {
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
       padding: 0 10px;
       font-size: 13px;
       color: #333;
       background: white;
       outline: none;
-      width: 100%;
     }
-    .filter-select:focus, .filter-input:focus {
-      border-color: #4361EE;
-    }
-    .filter-date-range {
+    .f-select:focus, .f-input:focus { border-color: #4361EE; }
+    .f-select { min-width: 80px; }
+    .f-date-wrap {
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-    .filter-date-range .filter-input { width: 130px; }
-    .date-sep { font-size: 13px; color: #aaa; }
-    .filter-btn {
-      height: 34px;
-      padding: 0 20px;
-      background: #1b3a6e;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      cursor: pointer;
-      white-space: nowrap;
-      align-self: flex-end;
-    }
-    .filter-btn:hover { background: #2a4f8a; }
-    .filter-reset {
-      height: 34px;
-      padding: 0 16px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      height: 32px;
+      overflow: hidden;
       background: white;
-      color: #666;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      font-size: 13px;
-      cursor: pointer;
-      align-self: flex-end;
     }
+    .f-date-wrap:focus-within { border-color: #4361EE; }
+    .f-date-wrap .cal-icon {
+      padding: 0 8px;
+      color: #bbb;
+      font-size: 13px;
+    }
+    .f-date-range {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+    }
+    .f-date-range input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 88px;
+      background: transparent;
+    }
+    .f-date-sep { color: #bbb; font-size: 12px; }
+    .f-input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      height: 32px;
+      padding: 0 10px;
+      gap: 5px;
+      background: white;
+    }
+    .f-input-wrap:focus-within { border-color: #4361EE; }
+    .f-input-wrap .search-icon { color: #bbb; font-size: 13px; }
+    .f-input-wrap input {
+      border: none; outline: none;
+      font-size: 13px; color: #333;
+      width: 140px;
+      background: transparent;
+    }
+    .f-checkbox-group {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 13px; color: #555; cursor: pointer;
+    }
+    .f-checkbox-group input { width: 14px; height: 14px; cursor: pointer; }
+    .btn-query {
+      height: 32px; padding: 0 20px;
+      background: #4361EE; color: white;
+      border: none; border-radius: 4px;
+      font-size: 13px; cursor: pointer;
+    }
+    .btn-query:hover { background: #3452d4; }
+    .btn-reset {
+      height: 32px; padding: 0 16px;
+      background: white; color: #555;
+      border: 1px solid #d9d9d9; border-radius: 4px;
+      font-size: 13px; cursor: pointer;
+    }
+    .btn-reset:hover { border-color: #4361EE; color: #4361EE; }
 
-    /* Table card */
+    /* ===== TABLE ===== */
     .table-card {
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
       overflow: hidden;
     }
-    .table-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .table-card-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-    .table-total {
-      font-size: 13px;
-      color: #888;
-    }
-    .table-total em { color: #1b3a6e; font-style: normal; font-weight: 600; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    table { width: 100%; border-collapse: collapse; }
     thead th {
-      background: #f7f8fa;
-      padding: 10px 16px;
+      background: #fafafa;
+      padding: 11px 14px;
       font-size: 13px;
       color: #666;
       font-weight: 600;
       text-align: left;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #f0f0f0;
       white-space: nowrap;
     }
-    tbody tr {
-      border-bottom: 1px solid #f5f5f5;
-      transition: background 0.12s;
-    }
+    tbody tr { border-bottom: 1px solid #f5f5f5; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #f9fbff; }
     tbody td {
-      padding: 12px 16px;
+      padding: 12px 14px;
       font-size: 13px;
       color: #333;
-      vertical-align: top;
+      white-space: nowrap;
     }
-    td.idx { color: #aaa; width: 48px; }
-    td.domain-col { white-space: nowrap; }
-    .domain-tag {
+    td.idx { color: #aaa; }
+    .type-tag {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 1px 8px;
+      border-radius: 3px;
       font-size: 12px;
-      font-weight: 600;
     }
-    .tag-blue   { background: #e8f0fe; color: #1b3a6e; }
-    .tag-green  { background: #e6f9f0; color: #1a7a4a; }
-    .tag-orange { background: #fff3e0; color: #bf6000; }
-    .tag-red    { background: #ffeaea; color: #c62828; }
-    .tag-purple { background: #f3e8fd; color: #7b2fbe; }
-    .tag-teal   { background: #e0f7f5; color: #00796b; }
-    .tag-gray   { background: #f0f0f0; color: #666; }
+    .tag-praise  { background: #e6f9ef; color: #1a7a4a; }
+    .tag-complain { background: #ffeaea; color: #c62828; }
+    .tag-suggest { background: #e8f0fe; color: #1b3a6e; }
+    .tag-consult { background: #fff3e0; color: #bf6000; }
+    .status-tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .status-pending { background: #fff3e0; color: #bf6000; }
+    .status-done    { background: #e6f9ef; color: #1a7a4a; }
+    .status-review  { background: #e8f0fe; color: #1b3a6e; }
+    .action-link { color: #4361EE; cursor: pointer; font-size: 13px; }
+    .action-link:hover { text-decoration: underline; }
 
-    td.time-col { color: #888; white-space: nowrap; }
-    td.content-col {
-      max-width: 320px;
-      line-height: 1.6;
-      color: #444;
-    }
-    .content-abbr {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    /* Pagination */
+    /* ===== PAGINATION ===== */
     .pagination {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding: 14px 18px;
-      gap: 6px;
+      padding: 12px 16px;
+      gap: 4px;
       border-top: 1px solid #f0f0f0;
-    }
-    .page-info { font-size: 13px; color: #888; margin-right: 8px; }
-    .pg-btn {
-      height: 30px;
-      min-width: 30px;
-      padding: 0 8px;
-      border: 1px solid #e0e0e0;
-      border-radius: 5px;
-      background: white;
       font-size: 13px;
-      color: #333;
-      cursor: pointer;
     }
-    .pg-btn.active { background: #1b3a6e; color: white; border-color: #1b3a6e; }
-    .pg-btn:hover:not(.active) { border-color: #4361EE; color: #4361EE; }
+    .pg-total { color: #888; margin-right: 8px; }
+    .pg-btn {
+      min-width: 28px; height: 28px;
+      padding: 0 6px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: white;
+      font-size: 13px; color: #333;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pg-btn:hover:not(.active):not(.pg-dots) { border-color: #4361EE; color: #4361EE; }
+    .pg-btn.active { background: #4361EE; color: white; border-color: #4361EE; }
+    .pg-dots { border-color: transparent; background: transparent; cursor: default; letter-spacing: 1px; }
+    .pg-goto {
+      display: flex; align-items: center; gap: 4px;
+      color: #555; margin-left: 6px;
+    }
+    .pg-goto input {
+      width: 40px; height: 28px;
+      border: 1px solid #d9d9d9; border-radius: 4px;
+      text-align: center; font-size: 13px; outline: none;
+    }
+    .pg-goto input:focus { border-color: #4361EE; }
   </style>
 </head>
 <body>
 
-<!-- Top Nav -->
-<div class="topnav">
-  <div class="view-toggle">
-    <a class="vt-btn" href="index.html">移动端</a>
-    <a class="vt-btn active" href="console.html">控制台</a>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-logo">
+    健康宜兴
+    <span class="logo-dot">▼</span>
   </div>
-  <div class="nav-logo">宜兴智慧健康平台 — 管理后台</div>
-  <div class="nav-spacer"></div>
-  <div class="nav-user">
-    <div class="nav-avatar">管</div>
-    管理员
+  <div class="topbar-tabs">
+    <div class="topbar-tab active">
+      体检反馈
+      <span class="tab-close">×</span>
+    </div>
+    <div class="topbar-tab">结案审批</div>
+    <div class="topbar-tab">统计分析</div>
+  </div>
+  <div class="topbar-right">
+    <div class="view-toggle">
+      <a class="vt-btn" href="index.html">移动端</a>
+      <a class="vt-btn active" href="console.html">控制台</a>
+    </div>
+    <span class="icon">🔍</span>
+    <div class="notif-wrap">
+      <span class="icon">🔔</span>
+      <div class="notif-badge">0</div>
+    </div>
+    <div class="user-pill">
+      <div class="user-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+      <span class="user-name">155****68</span>
+    </div>
   </div>
 </div>
 
-<div class="page">
+<div class="layout">
 
-  <!-- Page header -->
-  <div class="page-header">
-    <div>
-      <div class="page-title">体检反馈管理</div>
-      <div class="page-subtitle">查看与统计居民体检反馈数据</div>
-    </div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">总反馈数</div>
-      <div class="stat-value">128<span>条</span></div>
-      <div class="stat-trend">↑ 较上周 +12</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">本月新增</div>
-      <div class="stat-value">34<span>条</span></div>
-      <div class="stat-trend">↑ 较上月 +8</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">待处理</div>
-      <div class="stat-value">15<span>条</span></div>
-      <div class="stat-trend down">↑ 较昨日 +3</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">匿名反馈</div>
-      <div class="stat-value">47<span>条</span></div>
-      <div class="stat-trend">占比 36.7%</div>
-    </div>
-  </div>
-
-  <!-- Filter -->
-  <div class="filter-bar">
-    <div class="filter-item">
-      <span class="filter-label">体检机构</span>
-      <select class="filter-select" id="f-hospital">
-        <option value="">全部机构</option>
-        <option>宜兴市人民医院</option>
-        <option>宜兴市中医院</option>
-        <option>宜兴市第二人民医院</option>
-      </select>
-    </div>
-    <div class="filter-item">
-      <span class="filter-label">时间范围</span>
-      <div class="filter-date-range">
-        <input type="date" class="filter-input" id="f-date-start" value="2026-04-01">
-        <span class="date-sep">至</span>
-        <input type="date" class="filter-input" id="f-date-end" value="2026-04-20">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="menu-group">
+      <div class="menu-item">
+        <span class="m-icon">⊞</span> 管控台台
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">⚙</span> 系统维护
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">👤</span> 患者服务
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">🌐</span> 互联网医院
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">👨‍⚕️</span> 医生服务
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">🏥</span> 医院服务
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">📋</span> 管理服务
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">📊</span> 报管系统
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">⊞</span> 应用中心
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">🏷</span> 科室配置
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item" style="padding-left:28px;font-size:12.5px;">
+        <span class="m-icon"></span> 药房发药
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">❤</span> 特定关怀
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">⊞</span> 业务中台
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item" style="padding-left:28px;font-size:12.5px;">
+        <span class="m-icon"></span> 体检预约
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">📄</span> 财务自备车报销
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">⊞</span> 码上督马上
+        <span class="m-arrow">∨</span>
+      </div>
+      <div class="menu-sub">
+        <div class="menu-item active">
+          <span class="m-icon"></span> 体检反馈
+        </div>
+        <div class="menu-item" style="padding-left:32px;font-size:12.5px;">
+          <span class="m-icon"></span> 结案审批
+        </div>
+        <div class="menu-item" style="padding-left:32px;font-size:12.5px;">
+          <span class="m-icon"></span> 统计分析
+        </div>
+        <div class="menu-item" style="padding-left:32px;font-size:12.5px;">
+          <span class="m-icon"></span> 机构负责人
+        </div>
+        <div class="menu-item" style="padding-left:32px;font-size:12.5px;">
+          <span class="m-icon"></span> 反馈情况统计
+        </div>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">⊞</span> 长三角专家专区
+        <span class="m-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="m-icon">⇄</span> 双向转诊
+        <span class="m-arrow">›</span>
       </div>
     </div>
-    <div class="filter-item">
-      <span class="filter-label">体检领域</span>
-      <select class="filter-select" id="f-domain">
-        <option value="">全部领域</option>
-        <option>制度机制</option>
-        <option>设施布局</option>
-        <option>办事流程</option>
-        <option>服务态度</option>
-        <option>信息公开</option>
-        <option>数字化服务</option>
-        <option>其他</option>
-      </select>
-    </div>
-    <button class="filter-btn" onclick="applyFilter()">查询</button>
-    <button class="filter-reset" onclick="resetFilter()">重置</button>
-  </div>
-
-  <!-- Table -->
-  <div class="table-card">
-    <div class="table-card-header">
-      <span class="table-card-title">反馈列表</span>
-      <span class="table-total">共 <em id="total-count">12</em> 条记录</span>
-    </div>
-    <table id="feedback-table">
-      <thead>
-        <tr>
-          <th>序号</th>
-          <th>体检机构</th>
-          <th>领域</th>
-          <th>反馈时间</th>
-          <th>反馈内容</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
-    <div class="pagination">
-      <span class="page-info">共 12 条 / 每页 10 条</span>
-      <button class="pg-btn active">1</button>
-      <button class="pg-btn">2</button>
-      <button class="pg-btn">›</button>
+    <div class="sidebar-footer">
+      <div class="menu-item">
+        <span class="m-icon">🏠</span> 返回首页
+      </div>
     </div>
   </div>
 
-</div>
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- Stat Cards -->
+    <div class="stats-row">
+      <div class="stat-card stat-card-1">
+        <div class="stat-title">累计数</div>
+        <div class="stat-num">128</div>
+        <div class="stat-sub">及时率：<em>82.03%</em></div>
+      </div>
+      <div class="stat-card stat-card-2">
+        <div class="stat-title">待处理</div>
+        <div class="stat-num">15</div>
+        <div class="stat-extra">已超时：<em>3</em></div>
+      </div>
+      <div class="stat-card stat-card-3">
+        <div class="stat-title">已处理/已评价</div>
+        <div class="stat-num">110</div>
+      </div>
+      <div class="stat-card stat-card-4">
+        <div class="stat-title">待审核</div>
+        <div class="stat-num">6</div>
+      </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-card">
+      <div class="filter-row">
+        <div class="f-group">
+          <span class="f-label">时间周期</span>
+          <select class="f-select" id="f-period">
+            <option>月</option>
+            <option>周</option>
+            <option>日</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <span class="f-label">操作日期</span>
+          <div class="f-date-wrap">
+            <span class="cal-icon">📅</span>
+            <div class="f-date-range">
+              <input type="month" id="f-start" value="2026-03">
+              <span class="f-date-sep">-</span>
+              <input type="month" id="f-end" value="2026-04">
+            </div>
+          </div>
+        </div>
+        <div class="f-group">
+          <span class="f-label">机构</span>
+          <select class="f-select" id="f-hospital" style="min-width:140px;">
+            <option value="">请选择机构</option>
+            <option>宜兴市人民医院</option>
+            <option>宜兴市中医院</option>
+            <option>宜兴市第二人民医院</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <span class="f-label">体检领域</span>
+          <select class="f-select" id="f-domain" style="min-width:120px;">
+            <option value="">请选择</option>
+            <option>制度机制</option>
+            <option>设施布局</option>
+            <option>办事流程</option>
+            <option>服务态度</option>
+            <option>信息公开</option>
+            <option>数字化服务</option>
+            <option>其他</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <span class="f-label">内容搜索</span>
+          <div class="f-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="f-keyword" placeholder="输入姓名或手机号">
+          </div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="f-group">
+          <span class="f-label">状态</span>
+          <select class="f-select" id="f-status" style="min-width:120px;">
+            <option value="">请选择</option>
+            <option>待审核</option>
+            <option>已结案</option>
+          </select>
+        </div>
+        <label class="f-checkbox-group">
+          <input type="checkbox" id="f-timeout"> 是否超时
+        </label>
+        <button class="btn-query" onclick="applyFilter()">查询</button>
+        <button class="btn-reset" onclick="resetFilter()">重置</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <table id="feedback-table">
+        <thead>
+          <tr>
+            <th style="width:56px;">序号</th>
+            <th style="width:90px;">领域</th>
+            <th style="width:90px;">反馈人</th>
+            <th style="width:130px;">手机号码</th>
+            <th style="width:160px;">反馈时间</th>
+            <th style="width:90px;">用户状态</th>
+            <th style="width:160px;">反馈单位</th>
+            <th style="width:90px;">处理状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="pagination">
+        <span class="pg-total">共 <span id="total-count">12</span> 条</span>
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">›</button>
+        <div class="pg-goto">前往 <input type="number" value="1" min="1"> 页</div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
 
 <script>
-const DOMAIN_TAGS = {
-  '制度机制': 'tag-blue',
-  '设施布局': 'tag-teal',
-  '办事流程': 'tag-green',
-  '服务态度': 'tag-orange',
-  '信息公开': 'tag-purple',
-  '数字化服务': 'tag-red',
-  '其他': 'tag-gray',
+const DOMAIN_CLASS = {
+  '服务态度':'tag-praise','制度机制':'tag-complain','数字化服务':'tag-suggest',
+  '办事流程':'tag-consult','设施布局':'tag-praise','信息公开':'tag-suggest','其他':'tag-consult'
 };
+const STATUS_CLASS = { '待审核':'status-pending','已结案':'status-done','已处理':'status-review' };
 
 const ALL_DATA = [
-  { hospital:'宜兴市人民医院', domain:'服务态度', time:'2026-04-20 09:12:35', content:'体检当天排队等候时间较长，窗口工作人员态度较冷漠，希望能改善服务质量。' },
-  { hospital:'宜兴市中医院', domain:'办事流程', time:'2026-04-19 14:23:07', content:'体检报告领取流程不清晰，到处询问才找到取报告的地方，建议增加指引标识。' },
-  { hospital:'宜兴市人民医院', domain:'设施布局', time:'2026-04-19 10:45:18', content:'体检中心卫生间数量不足，高峰期等候时间长，希望增加卫生间数量或错峰安排。' },
-  { hospital:'宜兴市第二人民医院', domain:'数字化服务', time:'2026-04-18 16:08:52', content:'手机预约体检时APP经常闪退，操作不流畅，建议优化小程序性能。' },
-  { hospital:'宜兴市人民医院', domain:'制度机制', time:'2026-04-18 11:31:29', content:'体检套餐价格与官网介绍不符，现场补缴了差价，希望价格透明统一。' },
-  { hospital:'宜兴市中医院', domain:'信息公开', time:'2026-04-17 09:58:44', content:'体检项目说明不够详细，不清楚各项检查的目的和注意事项，建议提供更详细的科普材料。' },
-  { hospital:'宜兴市人民医院', domain:'服务态度', time:'2026-04-17 08:22:13', content:'B超室工作人员非常耐心，解释清晰，整体体验很好，给予表扬。' },
-  { hospital:'宜兴市第二人民医院', domain:'办事流程', time:'2026-04-16 15:44:30', content:'抽血后需要自己去多个窗口领结果，建议统一汇总后一次性通知领取。' },
-  { hospital:'宜兴市人民医院', domain:'设施布局', time:'2026-04-15 13:20:05', content:'体检1楼候诊区座位不够，很多人站着等候，希望增加座位。' },
-  { hospital:'宜兴市中医院', domain:'其他', time:'2026-04-14 10:15:38', content:'体检报告出来的时间比承诺的晚了两天，影响了工作安排，希望能按时出结果。' },
-  { hospital:'宜兴市人民医院', domain:'数字化服务', time:'2026-04-13 09:05:22', content:'希望能在网上直接查看体检报告，现在只能去医院现场领取，不方便。' },
-  { hospital:'宜兴市第二人民医院', domain:'制度机制', time:'2026-04-12 14:37:50', content:'老年人免费体检项目宣传不到位，很多老人不知道可以免费体检，建议加强宣传。' },
+  { name:'莫芸芸', phone:'15250826698', time:'2026-04-21 09:54:09', hospital:'宜兴市中医院',      domain:'服务态度',   status:'待审核', content:'体检当天排队等候时间较长，窗口工作人员态度较冷漠。' },
+  { name:'秦杰',   phone:'18036898887', time:'2026-04-21 08:25:45', hospital:'宜兴市中医院',      domain:'办事流程',   status:'已结案', content:'体检报告领取流程不清晰，到处询问才找到取报告的地方。' },
+  { name:'任玥',   phone:'15739350599', time:'2026-04-21 08:17:37', hospital:'宜兴市人民医院',    domain:'制度机制',   status:'待审核', content:'体检套餐价格与官网介绍不符，现场补缴了差价。' },
+  { name:'张燕',   phone:'15961572205', time:'2026-04-21 07:56:53', hospital:'宜兴市中医院',      domain:'信息公开',   status:'待审核', content:'体检项目说明不够详细，不清楚各项检查的目的和注意事项。' },
+  { name:'张忙',   phone:'17712465830', time:'2026-04-20 22:51:35', hospital:'宜兴市第二人民医院',domain:'制度机制',   status:'待审核', content:'老年人免费体检项目宣传不到位，很多老人不知道可以免费体检。' },
+  { name:'周海英', phone:'13961591383', time:'2026-04-20 17:42:11', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'B超室工作人员非常耐心，解释清晰，整体体验很好，给予表扬。' },
+  { name:'李梅仙', phone:'13912465562', time:'2026-04-20 15:31:22', hospital:'宜兴市人民医院',    domain:'设施布局',   status:'已结案', content:'体检中心卫生间数量不足，高峰期等候时间长。' },
+  { name:'程康利', phone:'13639639871', time:'2026-04-20 09:35:40', hospital:'宜兴市人民医院',    domain:'办事流程',   status:'待审核', content:'抽血后需要自己去多个窗口领结果，建议统一汇总后通知领取。' },
+  { name:'李彩英', phone:'18888034364', time:'2026-04-20 09:30:30', hospital:'宜兴市中医院',      domain:'服务态度',   status:'已结案', content:'体检报告出来的时间比承诺的晚了两天，影响了工作安排。' },
+  { name:'李彩英', phone:'18888034364', time:'2026-04-20 09:27:28', hospital:'宜兴市中医院',      domain:'数字化服务', status:'已结案', content:'希望能在网上直接查看体检报告，现在只能去医院现场领取。' },
+  { name:'王大明', phone:'13800138000', time:'2026-04-19 16:08:52', hospital:'宜兴市第二人民医院',domain:'数字化服务', status:'待审核', content:'手机预约体检时APP经常闪退，操作不流畅，建议优化小程序性能。' },
+  { name:'陈小红', phone:'13912340099', time:'2026-04-18 11:20:44', hospital:'宜兴市人民医院',    domain:'其他',       status:'已结案', content:'体检1楼候诊区座位不够，很多人站着等候，希望增加座位。' },
 ];
 
 let filtered = [...ALL_DATA];
 
 function renderTable(data) {
-  const tbody = document.getElementById('table-body');
   document.getElementById('total-count').textContent = data.length;
-  tbody.innerHTML = data.map((row, i) => `
+  document.getElementById('table-body').innerHTML = data.map((row, i) => `
     <tr>
       <td class="idx">${i + 1}</td>
+      <td><span class="type-tag ${DOMAIN_CLASS[row.domain] || ''}">${row.domain}</span></td>
+      <td>${row.name}</td>
+      <td>${row.phone}</td>
+      <td>${row.time}</td>
+      <td>未删除</td>
       <td>${row.hospital}</td>
-      <td class="domain-col"><span class="domain-tag ${DOMAIN_TAGS[row.domain] || 'tag-gray'}">${row.domain}</span></td>
-      <td class="time-col">${row.time}</td>
-      <td class="content-col"><div class="content-abbr">${row.content}</div></td>
+      <td><span class="status-tag ${STATUS_CLASS[row.status] || ''}">${row.status}</span></td>
+      <td><span class="action-link" onclick="alert('${row.content}')">查看</span></td>
     </tr>
   `).join('');
 }
 
 function applyFilter() {
   const hospital = document.getElementById('f-hospital').value;
-  const domain = document.getElementById('f-domain').value;
-  const start = document.getElementById('f-date-start').value;
-  const end = document.getElementById('f-date-end').value;
-
+  const domain   = document.getElementById('f-domain').value;
+  const status   = document.getElementById('f-status').value;
+  const keyword  = document.getElementById('f-keyword').value.trim();
   filtered = ALL_DATA.filter(row => {
     if (hospital && row.hospital !== hospital) return false;
-    if (domain && row.domain !== domain) return false;
-    const rowDate = row.time.slice(0, 10);
-    if (start && rowDate < start) return false;
-    if (end && rowDate > end) return false;
+    if (domain   && row.domain   !== domain)   return false;
+    if (status   && row.status   !== status)   return false;
+    if (keyword  && !row.name.includes(keyword) && !row.phone.includes(keyword)) return false;
     return true;
   });
   renderTable(filtered);
 }
 
 function resetFilter() {
-  document.getElementById('f-hospital').value = '';
-  document.getElementById('f-domain').value = '';
-  document.getElementById('f-date-start').value = '2026-04-01';
-  document.getElementById('f-date-end').value = '2026-04-20';
+  ['f-hospital','f-domain','f-status'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-keyword').value = '';
+  document.getElementById('f-timeout').checked = false;
   filtered = [...ALL_DATA];
   renderTable(filtered);
 }
