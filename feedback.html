@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>体检反馈</title>
+  <title>体验反馈</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
@@ -221,7 +221,7 @@
 <div class="header">
   <span class="header-btn" onclick="history.back()">✕</span>
   <div class="header-center">
-    <div class="header-title">体检反馈</div>
+    <div class="header-title">体验反馈</div>
     <div class="header-url">yx-area-ddjy.juyizhilian.com</div>
   </div>
   <span class="header-btn header-more">···</span>
@@ -230,7 +230,7 @@
 <!-- Description -->
 <div class="content-bg">
 <div class="desc">
-  为了医院更好地了解您体检过程中的问题<br>
+  为了医院更好地了解您体验过程中的问题<br>
   请您详细填写以下信息，以便医院进行跟进处理
 </div>
 
@@ -272,14 +272,14 @@
 
     <div class="row" onclick="openSheet()" style="cursor:pointer;">
       <span class="star">*</span>
-      <span class="row-label">体检医院</span>
+      <span class="row-label">医院</span>
       <span class="row-value placeholder" id="hospital-val">请选择</span>
       <span class="arrow">▼</span>
     </div>
 
     <div class="reflect-label-row">
       <span class="star">*</span>
-      <span class="row-label">体检区域</span>
+      <span class="row-label">体验区域</span>
     </div>
     <div class="textarea-wrap">
       <input type="text" class="f-textarea inline-input"
@@ -289,7 +289,7 @@
 
     <div class="row" onclick="openSheet2()" style="cursor:pointer;">
       <span class="star">*</span>
-      <span class="row-label">体检领域</span>
+      <span class="row-label">体验领域</span>
       <span class="row-value placeholder" id="domain-val">请选择</span>
       <span class="arrow">▼</span>
     </div>
@@ -317,12 +317,12 @@
 </div>
 </div><!-- /content-bg -->
 
-<!-- 体检医院弹窗 -->
+<!-- 医院弹窗 -->
 <div class="sheet-mask" id="sheet-mask" onclick="onMaskClick(event)">
   <div class="sheet">
     <div class="sheet-header">
       <span class="sheet-cancel" onclick="closeSheet()">取消</span>
-      <span class="sheet-title">选择体检医院</span>
+      <span class="sheet-title">选择医院</span>
       <span class="sheet-confirm" onclick="closeSheet()">确定</span>
     </div>
     <div class="sheet-option" onclick="selectHospital(this,'宜兴市人民医院')">宜兴市人民医院<span class="check-icon" style="display:none;">✓</span></div>
@@ -331,12 +331,12 @@
   </div>
 </div>
 
-<!-- 体检领域弹窗 -->
+<!-- 体验领域弹窗 -->
 <div class="sheet-mask" id="sheet-mask2" onclick="onMaskClick2(event)">
   <div class="sheet">
     <div class="sheet-header">
       <span class="sheet-cancel" onclick="closeSheet2()">取消</span>
-      <span class="sheet-title">选择体检领域</span>
+      <span class="sheet-title">选择体验领域</span>
       <span class="sheet-confirm" onclick="closeSheet2()">确定</span>
     </div>
     <div class="sheet-option" onclick="selectDomain(this,'制度机制')">制度机制<span class="check-icon" style="display:none;">✓</span></div>
